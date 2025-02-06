@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, url_for, request, redirect
-from database import db, Admins, Students
+from models import db, Admins, Students  
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coraldb.sqlite3'
@@ -8,23 +8,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-with app.app_context():
-    db.drop_all()
-    db.create_all()
-
-    Ale = Students(name = "Alejandro Otermin", message = "Hi everyone, we'll be holding math tutoring after school in the gymtoday!")
-    Yanis = Students(name = "Yanis Fellache", message = "Reminder basketball practice is today at 5:00")
-    Stern = Admins(name = "Josh Stern", message = "Hey guys, reember the programming plans are due next Monday")
-    Behar = Admins(name = "Marisa Behar", message = "Free snacks at programming comp today!")
-    db.session.add(Ale)
-    db.session.add(Yanis)
-    db.session.add(Stern)
-    db.session.add(Behar)
-    db.session.commit()
-
-
 logged_in = False
-
 
 credentials = {
     "admin": "password123",
@@ -37,7 +21,6 @@ def home():
     if logged_in:
         return render_template('index.html')
     return redirect(url_for('login'))
-
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -53,9 +36,7 @@ def login():
         else:
             error = "Invalid credentials, please try again!"
 
-
     return render_template("login.html", error=error)
-
 
 @app.route('/admin')
 def admin():
@@ -69,10 +50,24 @@ def api_data():
 @app.route('/api/student_info', methods=['GET'])
 def get_studentInfo():
     items = Students.query.all()  
-    items_list = [{"id": item.student_id, "name": item.name, "message": item.message} for item in items]
-    print(items_list)
+    items_list = [{"name": item.name, "message": item.message} for item in items]
     return jsonify(items_list)
-    
+
+
+def create_db():
+    with app.app_context():
+        db.create_all()  
+        if not Admins.query.first() and not Students.query.first():
+            Ale = Students(name="Alejandro Otermin", message="Hi everyone, we'll be holding math tutoring after school in the gym today!")
+            Yanis = Students(name="Yanis Fellache", message="Reminder: basketball practice is today at 5:00")
+            Stern = Admins(name="Josh Stern", message="Hey guys, remember the programming plans are due next Monday")
+            Behar = Admins(name="Marisa Behar", message="Free snacks at the programming comp today!")
+
+            db.session.add_all([Ale, Yanis, Stern, Behar])
+            db.session.commit()
+
 
 if __name__ == '__main__':
+    create_db() 
+    print("Created DB") 
     app.run(debug=True)

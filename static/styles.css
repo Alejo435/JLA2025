@@ -33,7 +33,7 @@ body {
 }
 
 .topnav {
-  background-color: #333;
+  background: linear-gradient(-135deg, #505ec8, #4158d0);
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -50,7 +50,7 @@ body {
 }
 
 .topnav a:hover {
-  background-color: #ddd;
+  background: linear-gradient(-135deg, #28d40d, #057708);
   color: black;
 }
 

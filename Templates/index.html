@@ -4,10 +4,25 @@
     <h1>Welcome to the Student Page!</h1>
     <style> 
         ul { list-style: none; padding: 0; }
-        li { padding: 10px; border: 1px solid #ddd; margin: 5px 0; }
+        li { padding: 20px; 
+            border: 3px solid #ddd; 
+            margin: 5px 0; 
+            border-radius: 5px; }
+        h3 {
+            display: inline-block; 
+            padding: 8px 15px; 
+            border-radius: 5px; 
+        }
+
+        p { 
+            font-size: 1em; 
+            color: #555;
+            padding: 20px;  
+            margin-top: 5px; /* Add space between name and message */
+        }
     </style>
     <body> 
-        <h2>Item List</h2>
+        <h2>Studet Announcents</h2>
         <ul id="list-view"></ul>
 
         <script>
@@ -17,12 +32,21 @@
                 const data = await response.json();
                 
                 const listView = document.getElementById('list-view');
-                listView.innerHTML = ''; // Clear existing items
+                listView.innerHTML = ''; 
                 
                 data.forEach(item => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = item.name;
-                    listView.appendChild(listItem);
+                        
+                        const nameElement = document.createElement('h3');
+                        nameElement.textContent = item.name;
+
+                        const messageElement = document.createElement('p');
+                        messageElement.textContent = item.message;
+                        messageElement.classList.add('message');
+                        
+                        listItem.appendChild(nameElement);
+                        listItem.appendChild(messageElement);
+                        listView.appendChild(listItem)
                 });
             } catch (error) {
                 console.error('Error fetching data:', error);
