@@ -4,6 +4,12 @@
       <meta charset="utf-8">
       <title>Login</title>
       <link rel="stylesheet" href="/static/loginstyle.css">
+      <style>
+         .error {
+            color: red;
+            margin-top: 10px;
+         }
+      </style>
    </head>
    <body>
       <div class="wrapper">
@@ -22,6 +28,12 @@
             <div class="field">
                <input type="submit" value="Login">
             </div>
+
+            <!-- Display error message if it exists -->
+            {% if error %}
+            <p class="error">{{ error }}</p>
+            {% endif %}
+
             <div class="signup-link">
                Not a member? <a href="#">Signup now</a>
             </div>

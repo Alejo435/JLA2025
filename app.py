@@ -21,6 +21,7 @@ def home():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     global logged_in
+    error = None
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -29,10 +30,10 @@ def login():
             logged_in = True
             return redirect(url_for('home'))
         else:
-            return "Invalid credentials, please try again!", 401
+            error = "Invalid credentials, please try again!"
 
 
-    return render_template("login.html")
+    return render_template("login.html", error=error)
 
 
 @app.route('/admin')

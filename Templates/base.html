@@ -9,8 +9,8 @@
 <body>
 
     <nav class="topnav">
-        <a href="{{ url_for('home') }}" class="{% if request.path == '/index' %}active{% endif %}">Home</a>
-        <a href="{{ url_for('admin') }}" class="{% if request.path == '/admin' %}active{% endif %}">Admin</a>
+        <a href="{{ url_for('home') }}" class="{% if request.path == '/index' %}active{% endif %}">Student Page</a>
+        <a href="{{ url_for('admin') }}" class="{% if request.path == '/admin' %}active{% endif %}">Administration Page</a>
         
     </nav>
 
