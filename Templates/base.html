@@ -11,6 +11,7 @@
     <nav class="topnav">
         <a href="{{ url_for('home') }}" class="{% if request.path == '/index' %}active{% endif %}">Student Page</a>
         <a href="{{ url_for('admin') }}" class="{% if request.path == '/admin' %}active{% endif %}">Administration Page</a>
+        <a href="{{ url_for('schedule')}}" class="{% if request.path == '/schedule' %}active{% endif %}">Schedule</a>
         
     </nav>
 

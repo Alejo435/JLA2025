@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <title>Activity Scheduler</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
+      background-color: #f7f7f7;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .form-group label {
+      width: 160px;
+      margin-right: 10px;
+      font-size: 16px;
+    }
+    .form-group input {
+      padding: 8px;
+      font-size: 16px;
+      width: 120px;
+      margin-right: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .form-group input[type="number"] {
+      width: 80px;
+    }
+    .activity-inputs {
+      margin-bottom: 20px;
+    }
+    .activity-inputs label {
+      margin-right: 0px;
+    }
+    button {
+      background-color: #4070f4;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #schedule {
+      margin-top: 30px;
+    }
+    .schedule-item {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .schedule-item-break {
+      font-size: 16px;
+      margin-left: 20px;
+      font-style: italic;
+    }
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+    }
+    .checkbox-container input {
+      margin-right: 10px;
+    }
+    .checkbox-container input[type="checkbox"]:checked {
+      background-color: green; /* Make the checkbox green when checked */
+      border-color: green;
+      color: white;
+    }
+    .checkbox-container input[type="checkbox"]:checked::after {
+      content: "✔"; /* Display checkmark when checked */
+      color: white;
+      font-size: 16px;
+      position: absolute;
+      margin-left: 5px;
+    }
+    .break-button {
+      background-color: #007bff; /* Blue color */
+      color: #fff;
+      padding: 5px 10px; /* Smaller button */
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      margin-left: 10px;
+    }
+    .break-button:hover {
+      background-color: #0056b3; /* Darker blue when hovered */
+    }
+  </style>
+  
+</head>
+<body style="background: color #28d40d;;">
+  <div class="container">
+    <h1>Activity Scheduler with Breaks</h1>
+    
+    <div class="form-group">
+      <label for="totalHours">Enter total hours you have:</label>
+      <input type="number" id="totalHours" placeholder="Total hours" required> 
+    
+      <label for="totalMinutes">Enter total minutes you have:</label>
+      <input type="number" id="totalMinutes" placeholder="Total minutes" required>
+    </div>
+
+    <div class="form-group">
+      <label for="numActivities">Enter the number of activities:</label>
+      <input type="number" id="numActivities" placeholder="Number of activities" required>
+    </div>
+    
+    <div id="activityInputs" class="activity-inputs"></div>
+    
+    <button onclick="generateSchedule()">Generate Schedule</button>
+    
+    <div id="schedule"></div>
+  </div>
+
+  <script>
+    // Function to dynamically generate activity input fields
+    document.getElementById('numActivities').addEventListener('input', function() {
+      let numActivities = document.getElementById('numActivities').value;
+      let activityInputs = document.getElementById('activityInputs');
+      activityInputs.innerHTML = '';  // Clear existing inputs
+      
+      for (let i = 1; i <= numActivities; i++) {
+        // Dynamically create and append inputs for each activity
+        activityInputs.innerHTML += `
+          <div class="form-group">
+            <label for="activity${i}">Activity ${i} name:</label>
+            <input type="text" id="activity${i}" placeholder="Activity ${i} name" required>
+            
+            <label for="activityHours${i}">Hours:</label>
+            <input type="number" id="activityHours${i}" placeholder="Hours" required>
+            
+            <label for="activityMinutes${i}">Minutes:</label>
+            <input type="number" id="activityMinutes${i}" placeholder="Minutes" required>
+          </div>
+        `;
+      }
+    });
+
+    function generateSchedule() {
+      // Get total hours and minutes input values, if they're blank, set them to 0
+      const totalHours = parseInt(document.getElementById('totalHours').value) || 0;
+      const totalMinutes = parseInt(document.getElementById('totalMinutes').value) || 0;
+      const totalTimeInMinutes = (totalHours * 60) + totalMinutes; // Convert total time to minutes
+      const numActivities = parseInt(document.getElementById('numActivities').value);
+      let activities = [];
+      let totalRequiredTime = 0;
+
+      // Collect activity data from the input fields
+      for (let i = 1; i <= numActivities; i++) {
+        const activityName = document.getElementById(`activity${i}`).value || "Activity " + i; // Default name if blank
+        const activityHours = parseInt(document.getElementById(`activityHours${i}`).value) || 0; // Treat blank hours as 0
+        const activityMinutes = parseInt(document.getElementById(`activityMinutes${i}`).value) || 0; // Treat blank minutes as 0
+        const activityTimeInMinutes = (activityHours * 60) + activityMinutes; // Convert activity time to minutes
+        activities.push({ name: activityName, time: activityTimeInMinutes });
+        totalRequiredTime += activityTimeInMinutes;
+      }
+
+      // Ensure that the total required time doesn't exceed the available time
+      if (totalRequiredTime > totalTimeInMinutes) {
+        alert("The total time for all activities exceeds the available time. Please adjust the times.");
+        return;
+      }
+
+      let remainingTime = totalTimeInMinutes - totalRequiredTime;
+
+      // Calculate the number of breaks, which is one less than the number of activities
+      const numBreaks = numActivities - 1;
+      const equalBreakTime = numBreaks > 0 ? Math.floor(remainingTime / numBreaks) : 0;
+
+      let scheduleHTML = '<h2>Your Schedule:</h2>';
+
+      activities.forEach((activity, index) => {
+        scheduleHTML += `
+          <div class="schedule-item">
+            <div class="checkbox-container">
+              <input type="checkbox" id="activityCheckbox${index}" class="activity-checkbox">
+              <span>${activity.name}: ${Math.floor(activity.time / 60)} hours ${activity.time % 60} minutes</span>
+            </div>
+        `;
+        
+        // Add break after each activity except the last one
+        if (index < numActivities - 1) {
+          scheduleHTML += `
+            <div class="schedule-item-break">
+              Break: ${Math.floor(equalBreakTime / 60)} hours ${equalBreakTime % 60} minutes
+              <a href="enviornment.html" target="_blank" class="break-button">Break Ideas</a>
+            </div>
+          `;
+        }
+        
+        scheduleHTML += `</div>`;
+      });
+
+      // Display the generated schedule
+      document.getElementById('schedule').innerHTML = scheduleHTML;
+    }
+  </script>
+</body>
+{% endblock %}
+
+

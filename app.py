@@ -42,6 +42,11 @@ def login():
 def admin():
     return render_template('admin.html')
 
+@app.route('/schedule')
+def schedule():
+    return render_template('schedule/schedule.html')
+
+
 @app.route('/api/data', methods=['GET'])
 def api_data():
     data = {"message": "Hello from the API!", "status": "success"}
@@ -50,6 +55,12 @@ def api_data():
 @app.route('/api/student_info', methods=['GET'])
 def get_studentInfo():
     items = Students.query.all()  
+    items_list = [{"name": item.name, "message": item.message} for item in items]
+    return jsonify(items_list)
+
+@app.route('/api/admin_info', methods=['GET'])
+def get_adminInfo():
+    items = Admins.query.all()  
     items_list = [{"name": item.name, "message": item.message} for item in items]
     return jsonify(items_list)
 
