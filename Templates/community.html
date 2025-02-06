@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body>
+    <div class="community-container">
+        <!-- Form to ask a question or upload a file -->
+        <h1>Ask a Question or Upload a File</h1>
+        <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="post-form">
+            <textarea name="question" placeholder="Ask a question (optional)" class="input-field"></textarea>
+            <input type="file" name="file" class="input-field">
+            <button type="submit" class="submit-btn">Post</button>
+        </form>
+
+        <h2>Student Posts</h2>
+
+        <div class="posts">
+            {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <strong>{{ post.username }}</strong>
+                    </div>
+
+                    {% if post.question %}
+                        <p class="post-question">💬 <strong>Question:</strong> {{ post.question }}</p>
+                    {% endif %}
+
+                    {% if post.filename %}
+                        <div class="post-file">
+                            <p>📁 <strong>Uploaded File:</strong></p>
+                            <a href="{{ url_for('uploaded_file', filename=post.filename) }}" target="_blank">
+                                <img src="{{ url_for('uploaded_file', filename=post.filename) }}" alt="Uploaded File" class="file-img">
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <h4>Comments:</h4>
+                    <div class="comments">
+                        {% for comment in post.comments %}
+                            <div class="comment">
+                                <strong>{{ comment.username }}:</strong> {{ comment.text }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <form action="{{ url_for('comment', post_id=post.id) }}" method="POST" class="comment-form">
+                        <input type="text" name="text" placeholder="Add a comment..." required class="input-field">
+                        <button type="submit" class="submit-btn">Comment</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+{% endblock %}

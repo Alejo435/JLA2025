@@ -1,13 +1,19 @@
-from flask import Flask, render_template, jsonify, url_for, request, redirect
-from models import db, Admins, Students  
+from flask import Flask, render_template, jsonify, url_for, request, redirect, send_from_directory
+from models import db, Admins, Students, Comment, Post
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coraldb.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["UPLOAD_FOLDER"] = "uploads"
 
+if not os.path.exists("uploads"):
+    os.makedirs("uploads")
 
 db.init_app(app)
 
+current_user = ""
 logged_in = False
 
 credentials = {
@@ -24,7 +30,7 @@ def home():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    global logged_in
+    global logged_in, current_user
     error = None
     if request.method == "POST":
         username = request.form.get("username")
@@ -32,11 +38,28 @@ def login():
 
         if username in credentials and credentials[username] == password:
             logged_in = True
+            current_user = username
             return redirect(url_for('home'))
         else:
             error = "Invalid credentials, please try again!"
 
     return render_template("login.html", error=error)
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Handles the signup functionality."""
+    global credentials
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username in credentials:
+            return render_template("signup.html", error="Username already exists!")
+
+        credentials[username] = password
+        return redirect(url_for('login'))
+
+    return render_template("signup.html")
 
 @app.route('/admin')
 def admin():
@@ -46,6 +69,60 @@ def admin():
 def schedule():
     return render_template('schedule/schedule.html')
 
+
+@app.route('/chatbot')
+def chatbot():
+    return render_template('chatbot.html')
+
+@app.route('/community')
+def community():
+    """Renders the community page where posts, questions, and file uploads are displayed."""
+    posts = Post.query.all()  # Fetch all posts with questions & file uploads
+    return render_template('community.html', posts=posts)
+
+
+@app.route('/upload', methods=["POST", "GET"])
+def upload_file():
+    if request.method == "GET":
+        return redirect(url_for("community"))
+    """Handles file uploads and post creation."""
+    username = current_user
+    question = request.form.get("question")
+    file = request.files.get("file")
+
+    filename = None
+    if file and file.filename:
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+    # Ensure at least a question or file is provided
+    if not question and not filename:
+        return redirect(url_for("community"))
+
+    new_post = Post(username=username, question=question, filename=filename)
+    db.session.add(new_post)
+    db.session.commit()
+
+    return redirect(url_for("community"))
+
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    """Serves uploaded files."""
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+
+@app.route('/comment/<int:post_id>', methods=["POST"])
+def comment(post_id):
+    """Handles comment submission for posts."""
+    username = current_user
+    text = request.form.get("text")
+
+    new_comment = Comment(post_id=post_id, username=username, text=text)
+    db.session.add(new_comment)
+    db.session.commit()
+    
+    return redirect(url_for("community"))
 
 @app.route('/api/data', methods=['GET'])
 def api_data():

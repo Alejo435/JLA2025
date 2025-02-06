@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zapier Chatbot Embed</title>
+</head>
+<body>
+  <h1>Welcome to our chat box</h1>
+
+  <!-- Embed Zapier Chatbot -->
+  <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+
+  <zapier-interfaces-chatbot-embed
+    is-popup='false'
+    chatbot-id='cm6tlkkxe001j37csjgh266ee'
+    height='400px'
+    width='100%'>
+  </zapier-interfaces-chatbot-embed>
+</body>
+</html>
+
+{% endblock %}

@@ -2,8 +2,8 @@
 <html lang="en" dir="ltr">
    <head>
       <meta charset="utf-8">
-      <title>Login</title>
-      <link rel="stylesheet" href="/static/loginstyle.css">
+      <title>Signup</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='loginstyle.css') }}">
       <style>
          .error {
             color: red;
@@ -14,9 +14,9 @@
    <body>
       <div class="wrapper">
          <div class="title">
-            Login Form
+            Signup Form
          </div>
-         <form action="{{ url_for('login') }}" method="POST">
+         <form action="{{ url_for('signup') }}" method="POST">
             <div class="field">
                <input type="text" name="username" required>
                <label>Username</label>
@@ -26,7 +26,7 @@
                <label>Password</label>
             </div>
             <div class="field">
-               <input type="submit" value="Login">
+               <input type="submit" value="Signup">
             </div>
 
             <!-- Display error message if it exists -->
@@ -34,9 +34,9 @@
             <p class="error">{{ error }}</p>
             {% endif %}
 
-            <div class="signup-link">
-               Not a member? <a href="{{ url_for('signup') }}">Signup now</a>
-            </div>
+            <!-- <div class="signup-link">
+               Not a member? <a href="#">Signup now</a>
+            </div> -->
          </form>
       </div>
    </body>
