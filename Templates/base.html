@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Flask App</title>
+    <title>JLA Project</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
 
     <nav class="topnav">
-        <a href="{{ url_for('home') }}" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('home') }}" class="{% if request.path == '/index' %}active{% endif %}">Home</a>
         <a href="{{ url_for('admin') }}" class="{% if request.path == '/admin' %}active{% endif %}">Admin</a>
-        <a href="{{ url_for('api_data') }}">API</a>
+        
     </nav>
 
     <div class="content">
