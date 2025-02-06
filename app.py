@@ -1,8 +1,27 @@
 from flask import Flask, render_template, jsonify, url_for, request, redirect
-from db import db
-from db import Admins, Students
+from database import db, Admins, Students
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///coraldb.sqlite3'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+db.init_app(app)
+
+with app.app_context():
+    db.drop_all()
+    db.create_all()
+
+    Ale = Students(name = "Alejandro Otermin", message = "Hi everyone, we'll be holding math tutoring after school in the gymtoday!")
+    Yanis = Students(name = "Yanis Fellache", message = "Reminder basketball practice is today at 5:00")
+    Stern = Admins(name = "Josh Stern", message = "Hey guys, reember the programming plans are due next Monday")
+    Behar = Admins(name = "Marisa Behar", message = "Free snacks at programming comp today!")
+    db.session.add(Ale)
+    db.session.add(Yanis)
+    db.session.add(Stern)
+    db.session.add(Behar)
+    db.session.commit()
+
 
 logged_in = False
 
@@ -49,7 +68,7 @@ def api_data():
 
 @app.route('/api/student_info', methods=['GET'])
 def get_studentInfo():
-    items = Admins.query.all()  
+    items = Students.query.all()  
     items_list = [{"id": item.student_id, "name": item.name, "message": item.message} for item in items]
     print(items_list)
     return jsonify(items_list)
