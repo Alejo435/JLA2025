@@ -1,9 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Welcome to the Home Page</h1>
+    <h1>Welcome to the Student Page!</h1>
+    <style> 
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; border: 1px solid #ddd; margin: 5px 0; }
+    </style>
     <body> 
+        <h2>Item List</h2>
+        <ul id="list-view"></ul>
 
-        
+        <script>
+            async function fetchItems() {
+            try {
+                const response = await fetch('/api/student_info');
+                const data = await response.json();
+                
+                const listView = document.getElementById('list-view');
+                listView.innerHTML = ''; // Clear existing items
+                
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item.name;
+                    listView.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        fetchItems();
+        </script>
+
     </body>
 {% endblock %}

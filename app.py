@@ -1,4 +1,6 @@
 from flask import Flask, render_template, jsonify, url_for, request, redirect
+from db import db
+from db import Admins, Students
 
 app = Flask(__name__)
 
@@ -44,6 +46,14 @@ def admin():
 def api_data():
     data = {"message": "Hello from the API!", "status": "success"}
     return jsonify(data)
+
+@app.route('/api/student_info', methods=['GET'])
+def get_studentInfo():
+    items = Admins.query.all()  
+    items_list = [{"id": item.student_id, "name": item.name, "message": item.message} for item in items]
+    print(items_list)
+    return jsonify(items_list)
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
